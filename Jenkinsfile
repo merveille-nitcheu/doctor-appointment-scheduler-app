@@ -71,15 +71,39 @@ pipeline{
         stage( 'OWASP Dependecy-Check' ) { 
             steps { 
                 echo 'OWASP Dependecy-Check....'
-                dependencyCheck additionalArguments: ''' 
+                script{
+                    try {
+                        dependencyCheck additionalArguments: ''' 
                             -o './' 
                             -s './' 
                             -f 'ALL' 
                             --prettyPrint''' , odcInstallation: 'dependecy_ckeck'
                 
-                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                    }
+                    catch (Exception e) {
+                        error "Error dependacy-check project: ${e.message}"
+                    }
+                }
+                
             } 
         }
+        
+        stage('SonarQube Analysis') {
+            echo 'Run SonarQube Analysis...'
+            script{
+                try {
+                    withSonarQubeEnv() {
+                        sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
+                    }
+                }
+                catch (Exception e) {
+                        error "Error build project: ${e.message}"
+                }
+            }           
+        }
+
+
     }
     // post{
     //     always{
