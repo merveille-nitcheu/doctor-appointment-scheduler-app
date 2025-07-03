@@ -95,7 +95,7 @@ pipeline{
                 echo 'Run SonarQube Analysis...'
                 script{
                     try {
-                        withSonarQubeEnv('SonarScanner') {
+                        withSonarQubeEnv() {
                             bat "mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
                         }
                     }
