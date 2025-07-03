@@ -67,6 +67,19 @@ pipeline{
                 }
             }
         }
+
+        stage( 'OWASP Dependecy-Check' ) { 
+            steps { 
+                echo 'OWASP Dependecy-Check....'
+                dependencyCheck additionalArguments: ''' 
+                            -o './' 
+                            -s './' 
+                            -f 'ALL' 
+                            --prettyPrint''' , odcInstallation: 'dependecy_ckeck'
+                
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+            } 
+        }
     }
     // post{
     //     always{
