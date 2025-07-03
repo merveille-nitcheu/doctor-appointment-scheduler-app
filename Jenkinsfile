@@ -1,34 +1,64 @@
 pipeline{
-    agent{
-        label "node"
+    agent any
+
+    tools {
+    maven 'Maven3'
+    jdk 'Java17'
     }
     stages{
-        stage("A"){
-            steps{
-                echo "========executing A========"
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace...'
+                echo "Current GIT Branch: ${env.GIT_BRANCH}"
+                cleanWs(cleanWhenNotBuilt: true, notFailBuild: true, deleteDirs: true)
             }
-            post{
-                always{
-                    echo "========always========"
+        }
+
+        stage('Clone Repositorie') {
+            // when {
+            //     expression { env.GIT_BRANCH == 'origin/develop' }
+            // }
+            steps {
+                echo 'Cloning repositories....'
+                script {
+                    try {
+                        checkout scm
+
+
+                    } catch (Exception e) {
+                        error "Error cloning repositories: ${e.message}"
+                    }
                 }
-                success{
-                    echo "========A executed successfully========"
-                }
-                failure{
-                    echo "========A execution failed========"
+            }
+        }
+
+        stage('Build Maven Project') {
+            // when {
+            //     expression { env.GIT_BRANCH == 'origin/develop' }
+            // }
+            steps {
+                echo 'Build Maven Project....'
+                script {
+                    try {
+                        bat 'mvn clean install -DskipTests'
+
+
+                    } catch (Exception e) {
+                        error "Error build project: ${e.message}"
+                    }
                 }
             }
         }
     }
-    post{
-        always{
-            echo "========always========"
-        }
-        success{
-            echo "========pipeline executed successfully ========"
-        }
-        failure{
-            echo "========pipeline execution failed========"
-        }
-    }
+    // post{
+    //     always{
+    //         echo "========always========"
+    //     }
+    //     success{
+    //         echo "========pipeline executed successfully ========"
+    //     }
+    //     failure{
+    //         echo "========pipeline execution failed========"
+    //     }
+    // }
 }
