@@ -50,24 +50,6 @@ pipeline{
             }
         }
 
-        stage('Build Maven Project') {
-            // when {
-            //     expression { env.GIT_BRANCH == 'origin/develop' }
-            // }
-            steps {
-                echo 'Build Maven Project....'
-                script {
-                    try {
-                        bat 'mvn clean install -DskipTests'
-
-
-                    } catch (Exception e) {
-                        error "Error build project: ${e.message}"
-                    }
-                }
-            }
-        }
-
         stage('Run units Tests') {
             // when {
             //     expression { env.GIT_BRANCH == 'origin/develop' }
