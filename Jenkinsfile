@@ -90,17 +90,20 @@ pipeline{
         }
         
         stage('SonarQube Analysis') {
-            echo 'Run SonarQube Analysis...'
-            script{
-                try {
-                    withSonarQubeEnv() {
-                        sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
+            steps{
+
+                echo 'Run SonarQube Analysis...'
+                script{
+                    try {
+                        withSonarQubeEnv() {
+                            sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
+                        }
                     }
-                }
-                catch (Exception e) {
+                    catch (Exception e) {
                         error "Error build project: ${e.message}"
-                }
-            }           
+                    }
+                } 
+            }                  
         }
 
 
