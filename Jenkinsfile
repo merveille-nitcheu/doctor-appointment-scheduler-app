@@ -96,7 +96,7 @@ pipeline{
                 script{
                     try {
                         withSonarQubeEnv() {
-                            sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
+                            bat "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
                         }
                     }
                     catch (Exception e) {
