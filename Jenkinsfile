@@ -22,23 +22,21 @@ pipeline{
             }
         }
 
-        // stage('Clone Repositorie') {
-        //     // when {
-        //     //     expression { env.GIT_BRANCH == 'origin/develop' }
-        //     // }
-        //     steps {
-        //         echo 'Cloning repositories....'
-        //         script {
-        //             try {
-        //                 checkout scm
-
-
-        //             } catch (Exception e) {
-        //                 error "Error cloning repositories: ${e.message}"
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Clone Repositorie') {
+            // when {
+            //     expression { env.GIT_BRANCH == 'origin/develop' }
+            // }
+            steps {
+                echo 'Cloning repositories....'
+                script {
+                    try {
+                        checkout scm
+                    } catch (Exception e) {
+                        error "Error cloning repositories: ${e.message}"
+                    }
+                }
+            }
+        }
 
         // stage('Build Maven Project') {
         //     // when {
