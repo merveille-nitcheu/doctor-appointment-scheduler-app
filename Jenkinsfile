@@ -5,6 +5,13 @@ pipeline{
     maven 'Maven3'
     jdk 'Java17'
     }
+
+    environment {
+
+        IMAGE_TAG = "version-${env.BUILD_NUMBER}"
+        IMAGE_NAME = "${APP_NAME}:${IMAGE_TAG}"
+
+    }
     stages{
         stage('Clean Workspace') {
             steps {
@@ -98,12 +105,42 @@ pipeline{
                         withSonarQubeEnv() {
                             bat "mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
                         }
+                        timeout(time: 2, unit: 'MINUTES') {
+                            def qg = waitForQualityGate() 
+                            if (qg.status != 'OK') {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
+                        }
                     }
                     catch (Exception e) {
                         error "Error build project: ${e.message}"
                     }
                 } 
             }                  
+        }
+
+        stage('Build Docker Images') {
+            
+            steps {
+                echo 'Building Docker images...'
+                script {
+                    try {
+
+                        bat "echo ${env.IMAGE_NAME}"
+
+                        // bat 'docker build --no-cache -t $IMAGE_NAME .'
+
+                        // bat "docker build --no-cache -t ${env.IMAGE_NAME} ."
+
+                        // bat "docker tag ${env.IMAGE_NAME_FRONTEND}:${env.IMAGE_TAG_FRONTEND} ${env.IMAGE_NAME_FRONTEND}:latest"
+
+
+
+                    } catch (Exception e) {
+                        error "Error building Docker images: ${e.message}"
+                    }
+                }
+            }
         }
 
 
