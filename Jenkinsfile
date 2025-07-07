@@ -180,7 +180,7 @@ pipeline{
                         serverUrl: 'http://localhost:808/',
                         apiKey: "${env.API_KEY}",
                         project: 'Doctor_appointment_scheduler',
-                        filePath: 'target/bom.xml',
+                        filePath: 'target/bom.json',
                         synchronous: true // Set to false for asynchronous publishing
                         )
 
