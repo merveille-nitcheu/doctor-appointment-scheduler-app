@@ -9,7 +9,6 @@ pipeline{
     environment {
 
         IMAGE_TAG = "version-${env.BUILD_NUMBER}"
-        API_KEY = credentials('Dependency_track')
         APP_NAME = ""
         IMAGE_NAME = ""
         IMAGE_LATEST = ""
@@ -167,30 +166,30 @@ pipeline{
         //     }
         // }
 
-        stage('Generate Sbom & Push on Dependency Track') {
+        // stage('Generate Sbom & Push on Dependency Track') {
             
-            steps {
-                echo 'Generate Sbom & Push on Dependency Track...'
-                script {
-                    try {
+        //     steps {
+        //         echo 'Generate Sbom & Push on Dependency Track...'
+        //         script {
+        //             try {
 
-                        bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+        //                 bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
 
-                        dependencyTrack(
-                        serverUrl: 'http://localhost:808/',
-                        apiKey: "${env.API_KEY}",
-                        project: 'Doctor_appointment_scheduler',
-                        filePath: 'bom.json',
-                        synchronous: true // Set to false for asynchronous publishing
-                        )
+        //                 dependencyTrack(
+        //                 serverUrl: 'http://localhost:808/',
+        //                 apiKey: "${env.API_KEY}",
+        //                 project: 'Doctor_appointment_scheduler',
+        //                 filePath: 'target/bom.xml',
+        //                 synchronous: true // Set to false for asynchronous publishing
+        //                 )
 
 
-                    } catch (Exception e) {
-                        error "Error pushing Docker images: ${e.message}"
-                    }
-                }
-            }
-        }
+        //             } catch (Exception e) {
+        //                 error "Error pushing Docker images: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
 
     }
