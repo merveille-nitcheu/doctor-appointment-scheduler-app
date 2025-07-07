@@ -21,103 +21,103 @@ pipeline{
             }
         }
 
-        stage('Clone Repositorie') {
-            // when {
-            //     expression { env.GIT_BRANCH == 'origin/develop' }
-            // }
-            steps {
-                echo 'Cloning repositories....'
-                script {
-                    try {
-                        checkout scm
+        // stage('Clone Repositorie') {
+        //     // when {
+        //     //     expression { env.GIT_BRANCH == 'origin/develop' }
+        //     // }
+        //     steps {
+        //         echo 'Cloning repositories....'
+        //         script {
+        //             try {
+        //                 checkout scm
 
 
-                    } catch (Exception e) {
-                        error "Error cloning repositories: ${e.message}"
-                    }
-                }
-            }
-        }
+        //             } catch (Exception e) {
+        //                 error "Error cloning repositories: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Build Maven Project') {
-            // when {
-            //     expression { env.GIT_BRANCH == 'origin/develop' }
-            // }
-            steps {
-                echo 'Build Maven Project....'
-                script {
-                    try {
-                        bat 'mvn clean install -DskipTests'
-
-
-                    } catch (Exception e) {
-                        error "Error build project: ${e.message}"
-                    }
-                }
-            }
-        }
-
-        stage('Run units Tests') {
-            // when {
-            //     expression { env.GIT_BRANCH == 'origin/develop' }
-            // }
-            steps {
-                echo 'Run units Tests....'
-                script {
-                    try {
-                        bat 'mvn test'
+        // stage('Build Maven Project') {
+        //     // when {
+        //     //     expression { env.GIT_BRANCH == 'origin/develop' }
+        //     // }
+        //     steps {
+        //         echo 'Build Maven Project....'
+        //         script {
+        //             try {
+        //                 bat 'mvn clean install -DskipTests'
 
 
-                    } catch (Exception e) {
-                        error "Error build project: ${e.message}"
-                    }
-                }
-            }
-        }
+        //             } catch (Exception e) {
+        //                 error "Error build project: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage( 'OWASP Dependecy-Check' ) { 
-            steps { 
-                echo 'OWASP Dependecy-Check....'
-                script{
-                    try {
-                        dependencyCheck additionalArguments: ''' 
-                            -o './' 
-                            -s './' 
-                            -f 'ALL' 
-                            --prettyPrint''' , odcInstallation: 'dependecy_ckeck'
+        // stage('Run units Tests') {
+        //     // when {
+        //     //     expression { env.GIT_BRANCH == 'origin/develop' }
+        //     // }
+        //     steps {
+        //         echo 'Run units Tests....'
+        //         script {
+        //             try {
+        //                 bat 'mvn test'
+
+
+        //             } catch (Exception e) {
+        //                 error "Error build project: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
+
+        // stage( 'OWASP Dependecy-Check' ) { 
+        //     steps { 
+        //         echo 'OWASP Dependecy-Check....'
+        //         script{
+        //             try {
+        //                 dependencyCheck additionalArguments: ''' 
+        //                     -o './' 
+        //                     -s './' 
+        //                     -f 'ALL' 
+        //                     --prettyPrint''' , odcInstallation: 'dependecy_ckeck'
                 
-                        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-                    }
-                    catch (Exception e) {
-                        error "Error dependacy-check project: ${e.message}"
-                    }
-                }
+        //                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+        //             }
+        //             catch (Exception e) {
+        //                 error "Error dependacy-check project: ${e.message}"
+        //             }
+        //         }
                 
-            } 
-        }
+        //     } 
+        // }
         
-        stage('SonarQube Analysis') {
-            steps{
+        // stage('SonarQube Analysis') {
+        //     steps{
 
-                echo 'Run SonarQube Analysis...'
-                script{
-                    try {
-                        withSonarQubeEnv() {
-                            bat "mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
-                        }
-                        timeout(time: 2, unit: 'MINUTES') {
-                            def qg = waitForQualityGate() 
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
-                        }
-                    }
-                    catch (Exception e) {
-                        error "Error build project: ${e.message}"
-                    }
-                } 
-            }                  
-        }
+        //         echo 'Run SonarQube Analysis...'
+        //         script{
+        //             try {
+        //                 withSonarQubeEnv() {
+        //                     bat "mvn clean verify sonar:sonar -Dsonar.projectKey=merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
+        //                 }
+        //                 timeout(time: 2, unit: 'MINUTES') {
+        //                     def qg = waitForQualityGate() 
+        //                     if (qg.status != 'OK') {
+        //                         error "Pipeline aborted due to quality gate failure: ${qg.status}"
+        //                     }
+        //                 }
+        //             }
+        //             catch (Exception e) {
+        //                 error "Error build project: ${e.message}"
+        //             }
+        //         } 
+        //     }                  
+        // }
 
         stage('Build Docker Images') {
             
