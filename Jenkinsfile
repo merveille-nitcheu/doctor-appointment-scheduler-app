@@ -9,7 +9,7 @@ pipeline{
     environment {
 
         IMAGE_TAG = "version-${env.BUILD_NUMBER}"
-        DT_API_KEY = credentials('Dependency_track')
+        API_KEY = credentials('Dependency_track')
         APP_NAME = ""
         IMAGE_NAME = ""
         IMAGE_LATEST = ""
@@ -177,7 +177,7 @@ pipeline{
                         bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
                         dependencyTrack(
                         serverUrl: 'http://localhost:808/',
-                        apiKey: "${env.IMAGE_NAME}",
+                        apiKey: "${env.API_KEY}",
                         project: 'Doctor_appointment_scheduler',
                         filePath: 'bom.json',
                         synchronous: true // Set to false for asynchronous publishing
