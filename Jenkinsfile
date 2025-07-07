@@ -9,7 +9,6 @@ pipeline{
     environment {
 
         IMAGE_TAG = "version-${env.BUILD_NUMBER}"
-        API_KEY = credentials('Dependency_track')
         APP_NAME = ""
         IMAGE_NAME = ""
         IMAGE_LATEST = ""
@@ -179,7 +178,7 @@ pipeline{
                         withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
                             dependencyTrackPublisher(
                                 artifact: 'target/bom.xml',
-                                projectName: 'Doctor_appointment_scheduler',
+                                projectName: "${env.APP_NAME}",
                                 projectVersion: "${env.BUILD_NUMBER}",
                                 synchronous: true,
                                 dependencyTrackApiKey: API_KEY,
