@@ -166,6 +166,23 @@ pipeline{
         //     }
         // }
 
+        stage('Generate Sbom') {
+            
+            steps {
+                echo 'Generate Sbom...'
+                script {
+                    try {
+
+                        bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+
+
+                    } catch (Exception e) {
+                        error "Error pushing Docker images: ${e.message}"
+                    }
+                }
+            }
+        }
+
 
     }
     // post{
