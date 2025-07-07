@@ -6,7 +6,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Create the final lightweight image
-FROM openjdk:26-oraclelinux9
+FROM openjdk:17-jdk-slim-buster
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
