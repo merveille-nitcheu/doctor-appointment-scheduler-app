@@ -176,13 +176,29 @@ pipeline{
 
                         bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
 
-                        dependencyTrack(
-                        serverUrl: 'http://localhost:808/',
-                        apiKey: "${env.API_KEY}",
-                        project: 'Doctor_appointment_scheduler',
-                        filePath: 'target/bom.json',
-                        synchronous: true // Set to false for asynchronous publishing
-                        )
+                        withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
+                            dependencyTrackPublisher(
+                                artifact: 'target/bom.json',
+                                projectName: 'Doctor_appointment_scheduler',
+                                projectVersion: "${env.BUILD_NUMBER}",
+                                synchronous: true,
+                                dependencyTrackApiKey: API_KEY,
+                                projectProperties: [
+                                    tags: ['cicd', 'jenkins', 'sbom'],
+                                    swidTagId: 'my-swid-tag-id',
+                                    group: 'team-bravo',
+                                    parentId: '' // tu peux laisser vide si pas de parent
+                                ]
+                            )
+                        }
+
+                        // dependencyTrack(
+                        // serverUrl: 'http://localhost:8082/',
+                        // apiKey: "${env.API_KEY}",
+                        // project: 'Doctor_appointment_scheduler',
+                        // filePath: 'target/bom.json',
+                        // synchronous: true // Set to false for asynchronous publishing
+                        // )
 
 
                     } catch (Exception e) {
