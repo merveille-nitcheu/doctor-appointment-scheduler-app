@@ -127,11 +127,11 @@ pipeline{
                 script {
                     try {
 
-                        // bat "docker build --no-cache -t ${env.IMAGE_NAME} ."
+                        bat "docker build --no-cache -t ${env.IMAGE_NAME} ."
 
-                        // bat "docker tag ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
+                        bat "docker tag ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
 
-                        bat "echo ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
+                        
 
 
 
