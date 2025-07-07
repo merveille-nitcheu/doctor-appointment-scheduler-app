@@ -9,6 +9,7 @@ pipeline{
     environment {
 
         IMAGE_TAG = "version-${env.BUILD_NUMBER}"
+        DT_API_KEY = credentials('Dependency_track')
         APP_NAME = ""
         IMAGE_NAME = ""
         IMAGE_LATEST = ""
@@ -166,14 +167,21 @@ pipeline{
         //     }
         // }
 
-        stage('Generate Sbom') {
+        stage('Generate Sbom & Push on Dependency Track') {
             
             steps {
-                echo 'Generate Sbom...'
+                echo 'Generate Sbom & Push on Dependency Track...'
                 script {
                     try {
 
                         bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+                        dependencyTrack(
+                        serverUrl: 'http://localhost:808/',
+                        apiKey: "${env.IMAGE_NAME}",
+                        project: 'Doctor_appointment_scheduler',
+                        filePath: 'bom.json',
+                        synchronous: true // Set to false for asynchronous publishing
+                    )
 
 
                     } catch (Exception e) {
