@@ -178,7 +178,7 @@ pipeline{
 
                         withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
                             dependencyTrackPublisher(
-                                artifact: 'target/bom.json',
+                                artifact: 'target/bom.xml',
                                 projectName: 'Doctor_appointment_scheduler',
                                 projectVersion: "${env.BUILD_NUMBER}",
                                 synchronous: true,
@@ -187,7 +187,7 @@ pipeline{
                                     tags: ['cicd', 'jenkins', 'sbom'],
                                     swidTagId: 'my-swid-tag-id',
                                     group: 'team-bravo',
-                                    parentId: '' // tu peux laisser vide si pas de parent
+                                    parentId: '' 
                                 ]
                             )
                         }
