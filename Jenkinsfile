@@ -9,8 +9,9 @@ pipeline{
     environment {
 
         IMAGE_TAG = "version-${env.BUILD_NUMBER}"
-        IMAGE_NAME = "${APP_NAME}:${IMAGE_TAG}"
-        IMAGE_LATEST = "${APP_NAME}:latest"
+        APP_NAME = ""
+        IMAGE_NAME = ""
+        IMAGE_LATEST = ""
 
     }
     stages{
@@ -19,6 +20,17 @@ pipeline{
                 echo 'Cleaning workspace...'
                 echo "Current GIT Branch: ${env.GIT_BRANCH}"
                 cleanWs(cleanWhenNotBuilt: true, notFailBuild: true, deleteDirs: true)
+            }
+        }
+
+        stage('Load .ci-env file') {
+            steps {
+                script {
+                    def props = readProperties file: '.ci-env'
+                    env.APP_NAME = props['APP_NAME']
+                    env.IMAGE_NAME = "${env.APP_NAME}:${env.IMAGE_TAG}"
+                    env.IMAGE_LATEST = "${env.APP_NAME}:latest"
+                }
             }
         }
 
@@ -129,16 +141,30 @@ pipeline{
 
                         bat "docker tag ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
 
-                        
-
-
-
                     } catch (Exception e) {
                         error "Error building Docker images: ${e.message}"
                     }
                 }
             }
         }
+
+        // stage('Push Images on ECR') {
+            
+        //     steps {
+        //         echo 'Push Images on ECR...'
+        //         script {
+        //             try {
+
+        //                 bat "docker build --no-cache -t ${env.IMAGE_NAME} ."
+
+        //                 bat "docker tag ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
+
+        //             } catch (Exception e) {
+        //                 error "Error pushing Docker images: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
 
     }

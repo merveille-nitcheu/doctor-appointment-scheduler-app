@@ -1,0 +1,3 @@
+ECR_REGISTRY = Java_project
+ECR_REPOSITORY= Java_project
+APP_NAME = Java_project
