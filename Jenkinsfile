@@ -9,9 +9,6 @@ pipeline{
     environment {
 
         IMAGE_TAG = "version-${env.BUILD_NUMBER}"
-        APP_NAME = ""
-        IMAGE_NAME = ""
-        IMAGE_LATEST = ""
 
     }
     stages{
