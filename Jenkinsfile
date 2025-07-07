@@ -23,7 +23,7 @@ pipeline{
         stage('Load .ci-env file') {
             steps {
                 script {
-                    def props = readProperties file: '.ci-env'
+                    def props = readProperties file: '.ci-env.properties'
                     env.APP_NAME = props['APP_NAME']
                     env.IMAGE_NAME = "${env.APP_NAME}:${env.IMAGE_TAG}"
                     env.IMAGE_LATEST = "${env.APP_NAME}:latest"
