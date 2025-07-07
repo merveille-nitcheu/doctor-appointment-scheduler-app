@@ -10,6 +10,7 @@ pipeline{
 
         IMAGE_TAG = "version-${env.BUILD_NUMBER}"
         IMAGE_NAME = "${APP_NAME}:${IMAGE_TAG}"
+        IMAGE_LATEST = "${APP_NAME}:latest"
 
     }
     stages{
@@ -126,13 +127,11 @@ pipeline{
                 script {
                     try {
 
-                        bat "echo ${env.IMAGE_NAME}"
-
-                        // bat 'docker build --no-cache -t $IMAGE_NAME .'
-
                         // bat "docker build --no-cache -t ${env.IMAGE_NAME} ."
 
-                        // bat "docker tag ${env.IMAGE_NAME_FRONTEND}:${env.IMAGE_TAG_FRONTEND} ${env.IMAGE_NAME_FRONTEND}:latest"
+                        // bat "docker tag ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
+
+                        bat "echo ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
 
 
 
