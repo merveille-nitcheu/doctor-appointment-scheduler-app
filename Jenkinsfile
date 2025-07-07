@@ -175,13 +175,14 @@ pipeline{
                     try {
 
                         bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+
                         dependencyTrack(
                         serverUrl: 'http://localhost:808/',
                         apiKey: "${env.API_KEY}",
                         project: 'Doctor_appointment_scheduler',
                         filePath: 'bom.json',
                         synchronous: true // Set to false for asynchronous publishing
-                    )
+                        )
 
 
                     } catch (Exception e) {
