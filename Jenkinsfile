@@ -39,6 +39,7 @@ pipeline{
                 echo 'Cloning repositories....'
                 script {
                     try {
+                        bat "echo ${env.APP_NAME}"
                         checkout scm
                     } catch (Exception e) {
                         error "Error cloning repositories: ${e.message}"
@@ -127,23 +128,23 @@ pipeline{
         //     }                  
         // }
 
-        stage('Build Docker Images') {
+        // stage('Build Docker Images') {
             
-            steps {
-                echo 'Building Docker images...'
-                script {
-                    try {
+        //     steps {
+        //         echo 'Building Docker images...'
+        //         script {
+        //             try {
 
-                        bat "docker build --no-cache -t ${env.IMAGE_NAME} ."
+        //                 bat "docker build --no-cache -t ${env.IMAGE_NAME} ."
 
-                        bat "docker tag ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
+        //                 bat "docker tag ${env.IMAGE_NAME} ${env.IMAGE_LATEST}"
 
-                    } catch (Exception e) {
-                        error "Error building Docker images: ${e.message}"
-                    }
-                }
-            }
-        }
+        //             } catch (Exception e) {
+        //                 error "Error building Docker images: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
         // stage('Push Images on ECR') {
             
@@ -163,51 +164,79 @@ pipeline{
         //     }
         // }
 
-        stage('Generate Sbom & Push on Dependency Track') {
+        // stage('Generate Sbom & Push on Dependency Track') {
             
-            steps {
-                echo 'Generate Sbom & Push on Dependency Track...'
-                script {
-                    try {
+        //     steps {
+        //         echo 'Generate Sbom & Push on Dependency Track...'
+        //         script {
+        //             try {
 
-                        bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+        //                 bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
 
-                        withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
-                            dependencyTrackPublisher(
-                                artifact: 'target/bom.xml',
-                                projectName: "${env.APP_NAME}",
-                                projectVersion: "${env.BUILD_NUMBER}",
-                                synchronous: true,
-                                dependencyTrackApiKey: API_KEY,
-                                // projectProperties: [
-                                //     tags: ['cicd', 'jenkins', 'sbom'],
-                                //     swidTagId: 'my-swid-tag-id',
-                                //     group: 'team-bravo',
-                                //     parentId: '' 
-                                // ]
-                            )
-                        }
+        //                 withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
+        //                     dependencyTrackPublisher(
+        //                         artifact: 'target/bom.xml',
+        //                         projectName: "${env.APP_NAME}",
+        //                         projectVersion: "${env.BUILD_NUMBER}",
+        //                         synchronous: true,
+        //                         dependencyTrackApiKey: API_KEY,
+        //                         // projectProperties: [
+        //                         //     tags: ['cicd', 'jenkins', 'sbom'],
+        //                         //     swidTagId: 'my-swid-tag-id',
+        //                         //     group: 'team-bravo',
+        //                         //     parentId: '' 
+        //                         // ]
+        //                     )
+        //                 }
 
 
 
-                    } catch (Exception e) {
-                        error "Error pushing Docker images: ${e.message}"
-                    }
-                }
-            }
-        }
+        //             } catch (Exception e) {
+        //                 error "Error pushing Docker images: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
 
     }
-    // post{
-    //     always{
-    //         echo "========always========"
-    //     }
-    //     success{
-    //         echo "========pipeline executed successfully ========"
-    //     }
-    //     failure{
-    //         echo "========pipeline execution failed========"
-    //     }
-    // }
+    post{
+        always{
+            cleanWs()
+        }
+        success {
+        echo "======== Pipeline executed successfully ========"
+            emailext(
+                to: "merveillenitcheu12@gmail.com",
+                subject: "✅ Jenkins Pipeline Succeeded: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """\
+                    The GitOps pipeline has completed successfully.
+
+                    ✔ Job: ${env.JOB_NAME}
+                    ✔ Build: #${env.BUILD_NUMBER}
+                    ✔ Result: ${currentBuild.currentResult}
+                    🔗 Jenkins URL: ${env.BUILD_URL}
+
+                    Everything looks good!
+                    """
+            )
+        }
+
+        failure {
+            emailext(
+                to: "merveillenitcheu12@gmail.com",
+                subject: "❌ Jenkins Pipeline Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """\
+                    The GitOps pipeline has failed.
+
+                    ✖ Job: ${env.JOB_NAME}
+                    ✖ Build: #${env.BUILD_NUMBER}
+                    ✖ Result: ${currentBuild.currentResult}
+                    🔗 Jenkins URL: ${env.BUILD_URL}
+
+                    Please check the Jenkins logs for more details.
+                    """
+            )
+        }
+    }
 }
