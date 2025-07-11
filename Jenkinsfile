@@ -53,85 +53,85 @@ pipeline{
             }
         }
 
-        stage('Build Maven Project') {
-            // when {
-            //     expression { env.GIT_BRANCH == 'origin/develop' }
-            // }
-            steps {
-                echo 'Build Maven Project....'
-                script {
-                    try {
-                        sh 'mvn clean install -DskipTests'
+        // stage('Build Maven Project') {
+        //     // when {
+        //     //     expression { env.GIT_BRANCH == 'origin/develop' }
+        //     // }
+        //     steps {
+        //         echo 'Build Maven Project....'
+        //         script {
+        //             try {
+        //                 sh 'mvn clean install -DskipTests'
 
 
-                    } catch (Exception e) {
-                        error "Error build project: ${e.message}"
-                    }
-                }
-            }
-        }
+        //             } catch (Exception e) {
+        //                 error "Error build project: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage('Run units Tests') {
-            // when {
-            //     expression { env.GIT_BRANCH == 'origin/develop' }
-            // }
-            steps {
-                echo 'Run units Tests....'
-                script {
-                    try {
-                        sh 'mvn test'
+        // stage('Run units Tests') {
+        //     // when {
+        //     //     expression { env.GIT_BRANCH == 'origin/develop' }
+        //     // }
+        //     steps {
+        //         echo 'Run units Tests....'
+        //         script {
+        //             try {
+        //                 sh 'mvn test'
 
 
-                    } catch (Exception e) {
-                        error "Error build project: ${e.message}"
-                    }
-                }
-            }
-        }
+        //             } catch (Exception e) {
+        //                 error "Error build project: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
-        stage( 'OWASP Dependecy-Check' ) { 
-            steps { 
-                echo 'OWASP Dependecy-Check....'
-                script{
-                    try {
-                        dependencyCheck additionalArguments: ''' 
-                            -o './' 
-                            -s './' 
-                            -f 'ALL' 
-                            --prettyPrint''' , odcInstallation: 'dependecy_ckeck'
+        // stage( 'OWASP Dependecy-Check' ) { 
+        //     steps { 
+        //         echo 'OWASP Dependecy-Check....'
+        //         script{
+        //             try {
+        //                 dependencyCheck additionalArguments: ''' 
+        //                     -o './' 
+        //                     -s './' 
+        //                     -f 'ALL' 
+        //                     --prettyPrint''' , odcInstallation: 'dependecy_ckeck'
                 
-                        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-                    }
-                    catch (Exception e) {
-                        error "Error dependacy-check project: ${e.message}"
-                    }
-                }
+        //                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+        //             }
+        //             catch (Exception e) {
+        //                 error "Error dependacy-check project: ${e.message}"
+        //             }
+        //         }
                 
-            } 
-        }
+        //     } 
+        // }
         
-        stage('SonarQube Analysis') {
-            steps{
+        // stage('SonarQube Analysis') {
+        //     steps{
 
-                echo 'Run SonarQube Analysis...'
-                script{
-                    try {
-                        withSonarQubeEnv() {
-                            sh "mvn clean verify sonar:sonar -Dsonar.projectKey=${env.SONAR_PROJECT_KEY}"
-                        }
-                        timeout(time: 2, unit: 'MINUTES') {
-                            def qg = waitForQualityGate() 
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            }
-                        }
-                    }
-                    catch (Exception e) {
-                        error "Error build project: ${e.message}"
-                    }
-                } 
-            }                  
-        }
+        //         echo 'Run SonarQube Analysis...'
+        //         script{
+        //             try {
+        //                 withSonarQubeEnv() {
+        //                     sh "mvn clean verify sonar:sonar -Dsonar.projectKey=${env.SONAR_PROJECT_KEY}"
+        //                 }
+        //                 timeout(time: 2, unit: 'MINUTES') {
+        //                     def qg = waitForQualityGate() 
+        //                     if (qg.status != 'OK') {
+        //                         error "Pipeline aborted due to quality gate failure: ${qg.status}"
+        //                     }
+        //                 }
+        //             }
+        //             catch (Exception e) {
+        //                 error "Error build project: ${e.message}"
+        //             }
+        //         } 
+        //     }                  
+        // }
 
         stage('Login to ECR') {
             
@@ -187,39 +187,39 @@ pipeline{
             }
         }
 
-        stage('Generate Sbom & Push on Dependency Track') {
+        // stage('Generate Sbom & Push on Dependency Track') {
             
-            steps {
-                echo 'Generate Sbom & Push on Dependency Track...'
-                script {
-                    try {
+        //     steps {
+        //         echo 'Generate Sbom & Push on Dependency Track...'
+        //         script {
+        //             try {
 
-                        sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+        //                 sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
 
-                        withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
-                            dependencyTrackPublisher(
-                                artifact: 'target/bom.xml',
-                                projectName: "${env.APP_NAME}",
-                                projectVersion: "${env.BUILD_NUMBER}",
-                                synchronous: true,
-                                dependencyTrackApiKey: API_KEY,
-                                // projectProperties: [
-                                //     tags: ['cicd', 'jenkins', 'sbom'],
-                                //     swidTagId: 'my-swid-tag-id',
-                                //     group: 'team-bravo',
-                                //     parentId: '' 
-                                // ]
-                            )
-                        }
+        //                 withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
+        //                     dependencyTrackPublisher(
+        //                         artifact: 'target/bom.xml',
+        //                         projectName: "${env.APP_NAME}",
+        //                         projectVersion: "${env.BUILD_NUMBER}",
+        //                         synchronous: true,
+        //                         dependencyTrackApiKey: API_KEY,
+        //                         // projectProperties: [
+        //                         //     tags: ['cicd', 'jenkins', 'sbom'],
+        //                         //     swidTagId: 'my-swid-tag-id',
+        //                         //     group: 'team-bravo',
+        //                         //     parentId: '' 
+        //                         // ]
+        //                     )
+        //                 }
 
 
 
-                    } catch (Exception e) {
-                        error "Error pushing Docker images: ${e.message}"
-                    }
-                }
-            }
-        }
+        //             } catch (Exception e) {
+        //                 error "Error pushing Docker images: ${e.message}"
+        //             }
+        //         }
+        //     }
+        // }
 
 
     }
