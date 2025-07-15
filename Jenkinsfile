@@ -25,16 +25,7 @@ pipeline{
             }
         }
 
-        // stage('Load .ci-env file') {
-        //     steps {
-        //         script {
-        //             def props = readProperties file: '.ci-env.properties'
-        //             env.APP_NAME = props['APP_NAME']
-        //             env.IMAGE_NAME = "${env.APP_NAME}:${env.IMAGE_TAG}"
-        //             env.IMAGE_LATEST = "${env.APP_NAME}:latest"
-        //         }
-        //     }
-        // }
+
 
         stage('Clone Repositorie') {
             // when {
@@ -44,7 +35,7 @@ pipeline{
                 echo 'Cloning repositories....'
                 script {
                     try {
-                        sh "echo ${env.APP_NAME}"
+                        
                         checkout scm
                     } catch (Exception e) {
                         error "Error cloning repositories: ${e.message}"
@@ -53,62 +44,62 @@ pipeline{
             }
         }
 
-        // stage('Build Maven Project') {
-        //     // when {
-        //     //     expression { env.GIT_BRANCH == 'origin/develop' }
-        //     // }
-        //     steps {
-        //         echo 'Build Maven Project....'
-        //         script {
-        //             try {
-        //                 sh 'mvn clean install -DskipTests'
+        stage('Build Maven Project') {
+            // when {
+            //     expression { env.GIT_BRANCH == 'origin/develop' }
+            // }
+            steps {
+                echo 'Build Maven Project....'
+                script {
+                    try {
+                        bat 'mvn clean install -DskipTests'
 
 
-        //             } catch (Exception e) {
-        //                 error "Error build project: ${e.message}"
-        //             }
-        //         }
-        //     }
-        // }
+                    } catch (Exception e) {
+                        error "Error build project: ${e.message}"
+                    }
+                }
+            }
+        }
 
-        // stage('Run units Tests') {
-        //     // when {
-        //     //     expression { env.GIT_BRANCH == 'origin/develop' }
-        //     // }
-        //     steps {
-        //         echo 'Run units Tests....'
-        //         script {
-        //             try {
-        //                 sh 'mvn test'
+        stage('Run units Tests') {
+            // when {
+            //     expression { env.GIT_BRANCH == 'origin/develop' }
+            // }
+            steps {
+                echo 'Run units Tests....'
+                script {
+                    try {
+                        bat 'mvn test'
 
 
-        //             } catch (Exception e) {
-        //                 error "Error build project: ${e.message}"
-        //             }
-        //         }
-        //     }
-        // }
+                    } catch (Exception e) {
+                        error "Error build project: ${e.message}"
+                    }
+                }
+            }
+        }
 
-        // stage( 'OWASP Dependecy-Check' ) { 
-        //     steps { 
-        //         echo 'OWASP Dependecy-Check....'
-        //         script{
-        //             try {
-        //                 dependencyCheck additionalArguments: ''' 
-        //                     -o './' 
-        //                     -s './' 
-        //                     -f 'ALL' 
-        //                     --prettyPrint''' , odcInstallation: 'dependecy_ckeck'
+        stage( 'OWASP Dependecy-Check' ) { 
+            steps { 
+                echo 'OWASP Dependecy-Check....'
+                script{
+                    try {
+                        dependencyCheck additionalArguments: ''' 
+                            -o './' 
+                            -s './' 
+                            -f 'ALL' 
+                            --prettyPrint''' , odcInstallation: 'dependecy_ckeck'
                 
-        //                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-        //             }
-        //             catch (Exception e) {
-        //                 error "Error dependacy-check project: ${e.message}"
-        //             }
-        //         }
+                        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                    }
+                    catch (Exception e) {
+                        error "Error dependacy-check project: ${e.message}"
+                    }
+                }
                 
-        //     } 
-        // }
+            } 
+        }
         
         // stage('SonarQube Analysis') {
         //     steps{
@@ -117,7 +108,7 @@ pipeline{
         //         script{
         //             try {
         //                 withSonarQubeEnv() {
-        //                     sh "mvn clean verify sonar:sonar -Dsonar.projectKey=${env.SONAR_PROJECT_KEY}"
+        //                     bat "mvn clean verify sonar:sonar -Dsonar.projectKey=${env.SONAR_PROJECT_KEY}"
         //                 }
         //                 timeout(time: 2, unit: 'MINUTES') {
         //                     def qg = waitForQualityGate() 
@@ -139,8 +130,9 @@ pipeline{
                 echo 'Login to ECR...'
                 script {
                     try {
+                       bat (Get-ECRLoginCommand).Password | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com
 
-                        sh ''' aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com '''
+                        // bat ''' aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com '''
 
                     } catch (Exception e) {
                         error "Error Login to ECR: ${e.message}"
@@ -156,9 +148,9 @@ pipeline{
                 script {
                     try {
 
-                        sh "docker build --no-cache -t ${env.ECR_REPO}:${env.IMAGE_TAG} ."
+                        bat "docker build --no-cache -t ${env.ECR_REPO}:${env.IMAGE_TAG} ."
 
-                        sh "docker tag ${env.ECR_REPO}:latest ${env.IMAGE_NAME}:latest "
+                        bat "docker tag ${env.ECR_REPO}:latest ${env.IMAGE_NAME}:latest "
 
                     } catch (Exception e) {
                         error "Error building Docker images: ${e.message}"
@@ -169,50 +161,16 @@ pipeline{
 
 
 
-        stage('Push Images on ECR') {
-            
-            steps {
-                echo 'Push Images on ECR...'
-                script {
-                    try {
-
-                        sh "docker push ${env.IMAGE_NAME}:latest"
-
-                        sh "docker push ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
-
-                    } catch (Exception e) {
-                        error "Error pushing Docker images: ${e.message}"
-                    }
-                }
-            }
-        }
-
-        // stage('Generate Sbom & Push on Dependency Track') {
+        // stage('Push Images on ECR') {
             
         //     steps {
-        //         echo 'Generate Sbom & Push on Dependency Track...'
+        //         echo 'Push Images on ECR...'
         //         script {
         //             try {
 
-        //                 sh 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+        //                 bat "docker push ${env.IMAGE_NAME}:latest"
 
-        //                 withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
-        //                     dependencyTrackPublisher(
-        //                         artifact: 'target/bom.xml',
-        //                         projectName: "${env.APP_NAME}",
-        //                         projectVersion: "${env.BUILD_NUMBER}",
-        //                         synchronous: true,
-        //                         dependencyTrackApiKey: API_KEY,
-        //                         // projectProperties: [
-        //                         //     tags: ['cicd', 'jenkins', 'sbom'],
-        //                         //     swidTagId: 'my-swid-tag-id',
-        //                         //     group: 'team-bravo',
-        //                         //     parentId: '' 
-        //                         // ]
-        //                     )
-        //                 }
-
-
+        //                 bat "docker push ${env.IMAGE_NAME}:${env.IMAGE_TAG}"
 
         //             } catch (Exception e) {
         //                 error "Error pushing Docker images: ${e.message}"
@@ -220,6 +178,35 @@ pipeline{
         //         }
         //     }
         // }
+
+        stage('Generate Sbom & Push on Dependency Track') {
+            
+            steps {
+                echo 'Generate Sbom & Push on Dependency Track...'
+                script {
+                    try {
+
+                        bat 'mvn org.cyclonedx:cyclonedx-maven-plugin:makeAggregateBom'
+
+                        withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
+                            dependencyTrackPublisher(
+                                artifact: 'target/bom.xml',
+                                projectName: "${env.APP_NAME}",
+                                projectVersion: "${env.BUILD_NUMBER}",
+                                synchronous: true,
+                                dependencyTrackApiKey: API_KEY,
+                                
+                            )
+                        }
+
+
+
+                    } catch (Exception e) {
+                        error "Error pushing Docker images: ${e.message}"
+                    }
+                }
+            }
+        }
 
 
     }
