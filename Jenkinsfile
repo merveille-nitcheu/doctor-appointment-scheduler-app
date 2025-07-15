@@ -12,7 +12,7 @@ pipeline{
         SONAR_PROJECT_KEY = "merveille-nitcheu_doctor-appointment-scheduler-app_AZfQiTNqKa9jn88UUm0-"
         ECR_REGISTRY = "890742601171.dkr.ecr.us-east-2.amazonaws.com"
         ECR_REPO = "java_project/doctor_appointment"
-        IMAGE_NAME = "${env.ECR_REGISTRY}:${env.ECR_REPO}"
+        IMAGE_NAME = "${env.ECR_REGISTRY}/${env.ECR_REPO}"
         AWS_DEFAULT_REGION= "us-east-2"
 
     }
@@ -132,7 +132,7 @@ pipeline{
                     try {
                             
 
-                        bat ''' aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com '''
+                        bat ''' aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com '''
 
                     } catch (Exception e) {
                         error "Error Login to ECR: ${e.message}"
