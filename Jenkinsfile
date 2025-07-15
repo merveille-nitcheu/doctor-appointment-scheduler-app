@@ -130,7 +130,7 @@ pipeline{
                 echo 'Login to ECR...'
                 script {
                     try {
-                       bat (Get-ECRLoginCommand).Password | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com
+                            (Get-ECRLoginCommand).Password | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com
 
                         // bat ''' aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com '''
 
