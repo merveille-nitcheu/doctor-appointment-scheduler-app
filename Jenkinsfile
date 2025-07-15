@@ -132,7 +132,7 @@ pipeline{
         //             try {
                             
 
-        //                 bat ''' aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com '''
+        //                 bat ''' aws ecr get-login-password --profile default --region us-east-2 | docker login --username AWS --password-stdin 890742601171.dkr.ecr.us-east-2.amazonaws.com '''
 
         //             } catch (Exception e) {
         //                 error "Error Login to ECR: ${e.message}"
