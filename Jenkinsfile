@@ -141,23 +141,28 @@ pipeline{
         //     }
         // }
 
-        stage('Build Docker Images') {
-            
+        stage('Build Docker Image') {
             steps {
-                echo 'Building Docker images...'
                 script {
                     try {
-
-                        bat "docker build --no-cache -t ${env.ECR_REPO}:${env.IMAGE_TAG} ."
-
-                        bat "docker tag ${env.ECR_REPO}:latest ${env.IMAGE_NAME}:latest "
-
+                        bat "docker build -t ${ECR_REPO}:${VERSION_TAG} ."
+                        bat "docker tag ${ECR_REPO}:${VERSION_TAG} ${ECR_REPO}:latest"
                     } catch (Exception e) {
-                        error "Error building Docker images: ${e.message}"
+                        error "Docker build failed: ${e.message}"
                     }
                 }
             }
         }
+
+        stage('Tag for ECR') {
+            steps {
+                script {
+                    bat "docker tag ${ECR_REPO}:${VERSION_TAG} ${IMAGE_NAME}:${VERSION_TAG}"
+                    bat "docker tag ${ECR_REPO}:latest ${IMAGE_NAME}:latest"
+                }
+            }
+        }
+
 
 
 
