@@ -145,8 +145,8 @@ pipeline{
             steps {
                 script {
                     try {
-                        bat "docker build -t ${ECR_REPO}:${VERSION_TAG} ."
-                        bat "docker tag ${ECR_REPO}:${VERSION_TAG} ${ECR_REPO}:latest"
+                        bat "docker build -t ${ECR_REPO}:${IMAGE_TAG} ."
+                        bat "docker tag ${ECR_REPO}:${IMAGE_TAG} ${ECR_REPO}:latest"
                     } catch (Exception e) {
                         error "Docker build failed: ${e.message}"
                     }
@@ -157,7 +157,7 @@ pipeline{
         stage('Tag for ECR') {
             steps {
                 script {
-                    bat "docker tag ${ECR_REPO}:${VERSION_TAG} ${IMAGE_NAME}:${VERSION_TAG}"
+                    bat "docker tag ${ECR_REPO}:${IMAGE_TAG} ${IMAGE_NAME}:${IMAGE_TAG}"
                     bat "docker tag ${ECR_REPO}:latest ${IMAGE_NAME}:latest"
                 }
             }
@@ -196,7 +196,7 @@ pipeline{
                         withCredentials([string(credentialsId: 'Dependency_track', variable: 'API_KEY')]) {
                             dependencyTrackPublisher(
                                 artifact: 'target/bom.xml',
-                                projectName: "${env.APP_NAME}",
+                                projectName: "${env.ECR_REPO}",
                                 projectVersion: "${env.BUILD_NUMBER}",
                                 synchronous: true,
                                 dependencyTrackApiKey: API_KEY,
