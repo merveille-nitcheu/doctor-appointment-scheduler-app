@@ -101,28 +101,28 @@ pipeline{
             } 
         }
         
-        // stage('SonarQube Analysis') {
-        //     steps{
+        stage('SonarQube Analysis') {
+            steps{
 
-        //         echo 'Run SonarQube Analysis...'
-        //         script{
-        //             try {
-        //                 withSonarQubeEnv() {
-        //                     bat "mvn clean verify sonar:sonar -Dsonar.projectKey=${env.SONAR_PROJECT_KEY}"
-        //                 }
-        //                 timeout(time: 2, unit: 'MINUTES') {
-        //                     def qg = waitForQualityGate() 
-        //                     if (qg.status != 'OK') {
-        //                         error "Pipeline aborted due to quality gate failure: ${qg.status}"
-        //                     }
-        //                 }
-        //             }
-        //             catch (Exception e) {
-        //                 error "Error build project: ${e.message}"
-        //             }
-        //         } 
-        //     }                  
-        // }
+                echo 'Run SonarQube Analysis...'
+                script{
+                    try {
+                        withSonarQubeEnv() {
+                            bat "mvn clean verify sonar:sonar -Dsonar.projectKey=${env.SONAR_PROJECT_KEY}"
+                        }
+                        timeout(time: 2, unit: 'MINUTES') {
+                            def qg = waitForQualityGate() 
+                            if (qg.status != 'OK') {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                            }
+                        }
+                    }
+                    catch (Exception e) {
+                        error "Error build project: ${e.message}"
+                    }
+                } 
+            }                  
+        }
 
         // stage('Login to ECR') {
             
